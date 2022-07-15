@@ -5,10 +5,10 @@ on: [push]
 env:
   SCHEMA_VERSION: 1.0.0
 
-  MYSQL_USER: test
-  MYSQL_PASSWORD: test
-  MYSQL_DATABASE: ispyb_build
-  MYSQL_ROOT_PASSWORD: password
+  MARIADB_USER: test
+  MARIADB_PASSWORD: test
+  MARIADB_DATABASE: ispyb_build
+  MARIADB_ROOT_PASSWORD: password
 
 jobs:
   update-models:
