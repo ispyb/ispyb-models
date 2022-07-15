@@ -25,7 +25,7 @@ jobs:
         uses: actions/setup-python@v3
       - name: Generate test database
         run: |
-          sudo apt-get update && sudo apt-get install -y mariadb-client
+          sudo apt-get update && sudo apt-get install -y mariadb-client-10.3
           cat >~/.my.cnf <<EOF
           [client]
           user=root
