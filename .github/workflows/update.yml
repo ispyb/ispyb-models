@@ -11,11 +11,11 @@ env:
   MYSQL_ROOT_PASSWORD: password
 
 jobs:
-  update-dep:
+  update-models:
     runs-on: ubuntu-latest
     services:
       mariadb:
-        image: mariadb:latest
+        image: mariadb:10.7
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
