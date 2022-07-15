@@ -48,10 +48,10 @@ jobs:
       - name: Update models
         run: |
           cd src/ispyb/models
-          pip install sqlacodegen black==22.3
+          pip install sqlacodegen black==22.3 mysql-connector-python
           sqlacodegen mysql+mysqlconnector://test:test@127.0.0.1/ispyb_build --noinflect --outfile _auto_db_schema.py
           black _auto_db_schema.py
-          patch -p1 < "patches/models.patch"
+          patch -p1 < ../../../patches/models.patch
           git diff
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
