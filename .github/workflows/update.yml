@@ -47,7 +47,7 @@ jobs:
           mysql -D ispyb_build -e "SHOW TABLES"
       - name: Update models
         run: |
-          cd ../src/ispyb/models
+          cd src/ispyb/models
           pip install sqlacodegen black==22.3
           sqlacodegen mysql+mysqlconnector://test:test@127.0.0.1/ispyb_build --noinflect --outfile _auto_db_schema.py
           black _auto_db_schema.py
