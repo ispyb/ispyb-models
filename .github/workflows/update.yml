@@ -5,17 +5,17 @@ on: [push]
 env:
   SCHEMA_VERSION: 1.0.0
 
-  MARIADB_USER: test
-  MARIADB_PASSWORD: test
-  MARIADB_DATABASE: ispyb_build
-  MARIADB_ROOT_PASSWORD: password
-
 jobs:
   update-models:
     runs-on: ubuntu-latest
     services:
       mariadb:
         image: mariadb:10.7
+        env:
+          MYSQL_USER: test
+          MYSQL_PASSWORD: test
+          MYSQL_DATABASE: ispyb_build
+          MYSQL_ROOT_PASSWORD: password
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
