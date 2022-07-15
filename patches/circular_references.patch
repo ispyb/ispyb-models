@@ -1,5 +1,5 @@
---- a/schemas/tables.sql
-+++ b/schemas/tables.sql
+--- a/schema/1_tables.sql
++++ b/schema/1_tables.sql
 @@ -625,7 +625,6 @@ CREATE TABLE `BLSample` (
    KEY `BLSampleImage_idx1` (`blSubSampleId`),
    KEY `BLSample_fk5` (`screenComponentGroupId`),
@@ -16,3 +16,4 @@
    CONSTRAINT `DataCollection_ibfk_2` FOREIGN KEY (`detectorId`) REFERENCES `Detector` (`detectorId`),
    CONSTRAINT `DataCollection_ibfk_3` FOREIGN KEY (`dataCollectionGroupId`) REFERENCES `DataCollectionGroup` (`dataCollectionGroupId`),
    CONSTRAINT `DataCollection_ibfk_6` FOREIGN KEY (`startPositionId`) REFERENCES `MotorPosition` (`motorPositionId`),
+   
