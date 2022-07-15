@@ -1,10 +1,10 @@
 name: Publish
 
-on:
-  workflow_run:
-    workflows: ["Lint"]
-    types:
-      - completed
+on: [push]
+  # workflow_run:
+  #   workflows: ["Lint"]
+  #   types:
+  #     - completed
 
 jobs:
   build-n-publish:
@@ -25,7 +25,8 @@ jobs:
           python setup.py sdist bdist_wheel
       - name: Publish distribution 📦 to PyPI
         # https://github.community/t/workflow-run-doent-preserve-github-ref/155148/4
-        if: startsWith(github.event.workflow_run.head_branch, 'refs/tags')
+        # if: startsWith(github.event.workflow_run.head_branch, 'refs/tags')
+        if: startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@master
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
