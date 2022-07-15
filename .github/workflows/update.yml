@@ -3,7 +3,7 @@ name: Update Models
 on: [push]
 
 env:
-  SCHEMA_VERSION: v1.0.0
+  SCHEMA_VERSION: 1.0.0
 
 jobs:
   update-models:
@@ -33,19 +33,20 @@ jobs:
           password=password
           database=ispyb_build
           EOF
-          wget https://github.com/ispyb/ispyb-database/archive/refs/tags/${SCHEMA_VERSION}.tar.gz
-          tar xfz ${SCHEMA_VERSION}.tar.gz
+          wget https://github.com/ispyb/ispyb-database/archive/refs/tags/v${SCHEMA_VERSION}.tar.gz
+          tar xfz v${SCHEMA_VERSION}.tar.gz
           ls
-          patch -p1 < patches/circular_references.patch
-          ln ~/.my.cnf .my.cnf -s
+          cd ispyb-database-${SCHEMA_VERSION}
+          patch -p1 < ../patches/circular_references.patch
+          ln -s ~/.my.cnf .my.cnf
           echo "Installing reference database"
-          ./build.sh
+          ./scripts/build.sh
           echo
           echo "Installed tables:"
           mysql -D ispyb_build -e "SHOW TABLES"
       - name: Update models
         run: |
-          cd src/ispyb/models
+          cd ../src/ispyb/models
           pip install sqlacodegen black==22.3
           sqlacodegen mysql+mysqlconnector://test:test@127.0.0.1/ispyb_build --noinflect --outfile _auto_db_schema.py
           black _auto_db_schema.py
@@ -56,7 +57,7 @@ jobs:
         with:
             token: ${{ secrets.PAT }}
             commit-message: Update models to schema version $SCHEMA_VERSION
-            title: Update models to schema version $SCHEMA_VERSION
+            title: Update models to schema version v${SCHEMA_VERSION}
             body: |
               This is an automated pull request to update the ISPyB ORM schema
 
@@ -64,4 +65,4 @@ jobs:
               * [] ensure tests pass
               * [] update `HISTORY.md` to reflect the changes in this pull request
 
-            branch: update-schema-$SCHEMA_VERSION
+            branch: update-schema-v${SCHEMA_VERSION}
