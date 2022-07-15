@@ -37,7 +37,8 @@ jobs:
           tar xfz v${SCHEMA_VERSION}.tar.gz
           ls
           cd ispyb-database-${SCHEMA_VERSION}
-          patch -p1 < ../patches/circular_references.patch
+          # Circular references dont yet exist in official schema
+          # patch -p1 < ../patches/circular_references.patch
           ln -s ~/.my.cnf .my.cnf
           echo "Installing reference database"
           ./scripts/build.sh
