@@ -10,7 +10,6 @@ from sqlalchemy import (
     Index,
     Integer,
     LargeBinary,
-    MetaData,
     SmallInteger,
     String,
     Table,
