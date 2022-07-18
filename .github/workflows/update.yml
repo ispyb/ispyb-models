@@ -22,7 +22,7 @@ jobs:
     steps:
       - id: database
         name: Get latest release
-        uses: pozetroninc/github-action-get-latest-release@main
+        uses: pozetroninc/github-action-get-latest-release@master
         with:
           repository: ispyb/ispyb-database
       - uses: actions/checkout@v3
