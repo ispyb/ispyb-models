@@ -21,7 +21,7 @@ from sqlalchemy.dialects.mysql.enumerated import ENUM
 from sqlalchemy.dialects.mysql.types import LONGBLOB
 from sqlalchemy.ext.declarative import declarative_base
 
-from pyispyb.app.extensions.database.utils import CustomBase
+from .base import CustomBase
 
 
 Base = declarative_base(cls=CustomBase)
