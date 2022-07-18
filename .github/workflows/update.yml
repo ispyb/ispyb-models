@@ -41,7 +41,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v3
       - name: Generate test database
-        if: $NEEDS_UPDATE == 1
+        if: env.NEEDS_UPDATE == 1
         run: |
           sudo apt-get update && sudo apt-get install -y mariadb-client-10.3
           cat >~/.my.cnf <<EOF
@@ -67,7 +67,7 @@ jobs:
           rm -rf ispyb-database-${SCHEMA_VERSION}
           rm v${SCHEMA_VERSION}.tar.gz
       - name: Update models
-        if: $NEEDS_UPDATE == 1
+        if: env.NEEDS_UPDATE == 1
         run: |
           cd src/ispyb/models
           pip install sqlalchemy sqlacodegen black==22.3 mysql-connector-python
@@ -76,7 +76,7 @@ jobs:
           patch -p1 _auto_db_schema.py < ../../../patches/models.patch
           rm _auto_db_schema.py.orig
       - name: Create Pull Request
-        if: $NEEDS_UPDATE == 1
+        if: env.NEEDS_UPDATE == 1
         uses: peter-evans/create-pull-request@v3
         with:
             token: ${{ secrets.GITHUB_TOKEN }}
