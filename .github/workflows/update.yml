@@ -29,7 +29,7 @@ jobs:
       - name: Check if update required
         run: |
           CURRENT_VERSION=$(grep __version__ src/ispyb/models/__init__.py | cut -d'"' -f2)
-          LATEST_VERSION=${{ steps.database.outputs.release }}"
+          LATEST_VERSION="${{ steps.database.outputs.release }}"
           echo "current: ${CURRENT_VERSION}"
           echo "latest: ${LATEST_VERSION}"
           if [ "$CURRENT_VERSION" = "${LATEST_VERSION}" ]; then
