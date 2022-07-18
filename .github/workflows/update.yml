@@ -1,9 +1,6 @@
 name: Update Models
 
-on: [push]
-
-env:
-  SCHEMA_VERSION: 1.0.0
+on: workflow_dispatch
 
 jobs:
   update-models:
