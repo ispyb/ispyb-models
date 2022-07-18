@@ -45,6 +45,9 @@ jobs:
           echo
           echo "Installed tables:"
           mysql -D ispyb_build -e "SHOW TABLES"
+          cd ..
+          rm -rf ispyb-database-${SCHEMA_VERSION}
+          rm v${SCHEMA_VERSION}.tar.gz
       - name: Update models
         run: |
           cd src/ispyb/models
@@ -52,18 +55,18 @@ jobs:
           sqlacodegen mysql+mysqlconnector://test:test@127.0.0.1/ispyb_build --noinflect --outfile _auto_db_schema.py
           black _auto_db_schema.py
           patch -p1 _auto_db_schema.py < ../../../patches/models.patch
-          git diff
+          rm _auto_db_schema.py.orig
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
             token: ${{ secrets.GITHUB_TOKEN }}
-            commit-message: Update models to schema version $SCHEMA_VERSION
-            title: Update models to schema version v${SCHEMA_VERSION}
+            commit-message: Update models to schema version ${{ env.SCHEMA_VERSION }}
+            title: Update models to schema version v${{ env.SCHEMA_VERSION }}
             body: |
               This is an automated pull request to update the ISPyB ORM schema
 
-              Before merging this pull request you may want to
-              * [] ensure tests pass
-              * [] update `HISTORY.md` to reflect the changes in this pull request
+              Before merging this pull request you may want to:
+              * [ ] Ensure tests pass
+              * [ ] Update `HISTORY.md` to reflect the changes in this pull request
 
-            branch: update-schema-v${SCHEMA_VERSION}
+            branch: update-schema-v${{ env.SCHEMA_VERSION }}
