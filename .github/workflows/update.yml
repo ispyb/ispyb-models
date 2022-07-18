@@ -28,15 +28,14 @@ jobs:
       - uses: actions/checkout@v3
       - name: Check if update required
         run: |
-          CURRENT_VERSION=$(grep __version__ src/ispyb/models_auto_db_schema.py | cut -d'"' -f2)
-          echo "${{ steps.database.outputs.release }}" >> $LATEST_VERSION
+          CURRENT_VERSION=$(grep __version__ src/ispyb/models/_auto_db_schema.py | cut -d'"' -f2)
           echo "current: ${CURRENT_VERSION}"
-          echo "latest: ${LATEST_VERSION}"
-          if [ "$CURRENT_VERSION" = "$LATEST_VERSION" ]; then
-            echo 0 >> $NEEDS_UPDATE
+          echo "latest: ${{ steps.database.outputs.release }}"
+          if [ "$CURRENT_VERSION" = "${{ steps.database.outputs.release }}" ]; then
+            echo "NEEDS_UPDATE=0" >> $GITHUB_ENV
           else
-            echo 1 >> $NEEDS_UPDATE
-            echo $LATEST_VERSION >> $SCHEMA_VERSION
+            echo "NEEDS_UPDATE=1" >> $GITHUB_ENV
+            echo "SCHEMA_VERSION=${{ steps.database.outputs.release }}" >> $GITHUB_ENV
           fi
       - name: Set up Python
         uses: actions/setup-python@v3
