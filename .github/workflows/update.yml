@@ -1,0 +1,89 @@
+name: Update Models
+
+on: workflow_dispatch
+
+jobs:
+  update-models:
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:10.7
+        env:
+          MYSQL_USER: test
+          MYSQL_PASSWORD: test
+          MYSQL_DATABASE: ispyb_build
+          MYSQL_ROOT_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - id: database
+        name: Get latest release
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+          repository: ispyb/ispyb-database
+      - uses: actions/checkout@v3
+      - name: Check if update required
+        run: |
+          CURRENT_VERSION=$(grep __version__ src/ispyb/models/__init__.py | cut -d'"' -f2)
+          LATEST_VERSION="${{ steps.database.outputs.release }}"
+          echo "current: ${CURRENT_VERSION}"
+          echo "latest: ${LATEST_VERSION}"
+          if [ "$CURRENT_VERSION" = "${LATEST_VERSION}" ]; then
+            echo "NEEDS_UPDATE=0" >> $GITHUB_ENV
+          else
+            echo "NEEDS_UPDATE=1" >> $GITHUB_ENV
+            echo "SCHEMA_VERSION=${LATEST_VERSION:1}" >> $GITHUB_ENV
+          fi
+      - name: Set up Python
+        uses: actions/setup-python@v3
+      - name: Generate test database
+        if: env.NEEDS_UPDATE == 1
+        run: |
+          sudo apt-get update && sudo apt-get install -y mariadb-client-10.3
+          cat >~/.my.cnf <<EOF
+          [client]
+          user=root
+          host=127.0.0.1
+          password=password
+          database=ispyb_build
+          EOF
+          wget https://github.com/ispyb/ispyb-database/archive/refs/tags/v${SCHEMA_VERSION}.tar.gz
+          tar xfz v${SCHEMA_VERSION}.tar.gz
+          ls
+          cd ispyb-database-${SCHEMA_VERSION}
+          # Circular references dont yet exist in official schema
+          # patch -p1 < ../patches/circular_references.patch
+          ln -s ~/.my.cnf .my.cnf
+          echo "Installing reference database"
+          ./scripts/build.sh
+          echo
+          echo "Installed tables:"
+          mysql -D ispyb_build -e "SHOW TABLES"
+          cd ..
+          rm -rf ispyb-database-${SCHEMA_VERSION}
+          rm v${SCHEMA_VERSION}.tar.gz
+      - name: Update models
+        if: env.NEEDS_UPDATE == 1
+        run: |
+          cd src/ispyb/models
+          pip install sqlalchemy sqlacodegen black==22.3 mysql-connector-python
+          sqlacodegen mysql+mysqlconnector://test:test@127.0.0.1/ispyb_build --noinflect --outfile _auto_db_schema.py
+          black _auto_db_schema.py
+          patch -p1 _auto_db_schema.py < ../../../patches/models.patch
+          rm _auto_db_schema.py.orig
+      - name: Create Pull Request
+        if: env.NEEDS_UPDATE == 1
+        uses: peter-evans/create-pull-request@v3
+        with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            commit-message: Update models to schema version ${{ env.SCHEMA_VERSION }}
+            title: Update models to schema version v${{ env.SCHEMA_VERSION }}
+            body: |
+              This is an automated pull request to update the ISPyB ORM schema
+
+              Before merging this pull request you may want to:
+              * [ ] Ensure tests pass
+              * [ ] Update `HISTORY.md` to reflect the changes in this pull request
+
+            branch: update-schema-v${{ env.SCHEMA_VERSION }}

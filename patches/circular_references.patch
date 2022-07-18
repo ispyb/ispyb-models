@@ -1,5 +1,5 @@
---- a/schemas/tables.sql
-+++ b/schemas/tables.sql
+--- a/schema/1_tables.sql
++++ b/schema/1_tables.sql
 @@ -625,7 +625,6 @@ CREATE TABLE `BLSample` (
    KEY `BLSampleImage_idx1` (`blSubSampleId`),
    KEY `BLSample_fk5` (`screenComponentGroupId`),

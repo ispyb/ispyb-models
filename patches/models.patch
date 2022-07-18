@@ -1,54 +1,45 @@
---- src/ispyb/models/_auto_db_schema.py	2022-05-16 10:59:21.378383096 +0200
-+++ src/ispyb/models/_auto_db_schema_patched.py	2022-05-16 10:51:49.581463629 +0200
-@@ -22,8 +22,10 @@
- from sqlalchemy.dialects.mysql.types import LONGBLOB
- from sqlalchemy.ext.declarative import declarative_base
- 
-+from .base import CustomBase
+--- a/src/ispyb/models/_auto_db_schema.py	2022-07-18 09:48:17.000000000 +0200
++++ b/src/ispyb/models/_auto_db_schema_patched.py	2022-07-18 10:21:46.000000000 +0200
+@@ -27,9 +27,10 @@
+     VARCHAR,
+ )
+ from sqlalchemy.orm import relationship
+-from sqlalchemy.ext.declarative import declarative_base
  
 -Base = declarative_base()
++from .base import CustomBase
++
 +Base = declarative_base(cls=CustomBase)
  metadata = Base.metadata
  
  
-@@ -46,25 +48,22 @@
+@@ -2706,15 +2707,15 @@
      comments = Column(String(512))
      creationTime = Column(DateTime)
  
 -    Model = relationship(
 +    AveragedModel = relationship(
-         "Model",
-         primaryjoin="AbInitioModel.averagedModelId == Model.modelId",
--        backref="model_model_ab_initio_models",
+         "Model", primaryjoin="AbInitioModel.averagedModelId == Model.modelId"
      )
-     ModelList = relationship(
-         "ModelList",
-         primaryjoin="AbInitioModel.modelListId == ModelList.modelListId",
-         backref="ab_initio_models",
-     )
+     ModelList = relationship("ModelList")
 -    Model1 = relationship(
 +    RapidShapeDeterminationModel = relationship(
          "Model",
          primaryjoin="AbInitioModel.rapidShapeDeterminationModelId == Model.modelId",
--        backref="model_model_ab_initio_models_0",
      )
 -    Model2 = relationship(
 +    ShapeDeterminationModel = relationship(
-         "Model",
-         primaryjoin="AbInitioModel.shapeDeterminationModelId == Model.modelId",
--        backref="model_model_ab_initio_models",
+         "Model", primaryjoin="AbInitioModel.shapeDeterminationModelId == Model.modelId"
      )
  
- 
-@@ -2558,11 +2557,6 @@
+@@ -5878,10 +5879,6 @@
+         "DataCollection",
          primaryjoin="Image.dataCollectionId == DataCollection.dataCollectionId",
-         backref="datacollection_images",
      )
 -    DataCollection1 = relationship(
 -        "DataCollection",
 -        primaryjoin="Image.dataCollectionId == DataCollection.dataCollectionId",
--        backref="datacollection_images_0",
 -    )
  
  
- class ImageQualityIndicators(Base):
+ class Movie(Base):
