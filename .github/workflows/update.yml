@@ -20,10 +20,28 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
+      - id: database
+        name: Get latest release
+        uses: pozetroninc/github-action-get-latest-release@main
+        with:
+          repository: ispyb/ispyb-database
       - uses: actions/checkout@v3
+      - name: Check if update required
+        run: |
+          CURRENT_VERSION=$(grep __version__ src/ispyb/models_auto_db_schema.py | cut -d'"' -f2)
+          echo "${{ steps.database.outputs.release }}" >> $LATEST_VERSION
+          echo "current: ${CURRENT_VERSION}"
+          echo "latest: ${LATEST_VERSION}"
+          if [ "$CURRENT_VERSION" = "$LATEST_VERSION" ]; then
+            echo 0 >> $NEEDS_UPDATE
+          else
+            echo 1 >> $NEEDS_UPDATE
+            echo $LATEST_VERSION >> $SCHEMA_VERSION
+          fi
       - name: Set up Python
         uses: actions/setup-python@v3
       - name: Generate test database
+        if: $NEEDS_UPDATE == 1
         run: |
           sudo apt-get update && sudo apt-get install -y mariadb-client-10.3
           cat >~/.my.cnf <<EOF
@@ -49,14 +67,16 @@ jobs:
           rm -rf ispyb-database-${SCHEMA_VERSION}
           rm v${SCHEMA_VERSION}.tar.gz
       - name: Update models
+        if: $NEEDS_UPDATE == 1
         run: |
           cd src/ispyb/models
-          pip install sqlalchemy==1.4.35 sqlacodegen black==22.3 mysql-connector-python
+          pip install sqlalchemy sqlacodegen black==22.3 mysql-connector-python
           sqlacodegen mysql+mysqlconnector://test:test@127.0.0.1/ispyb_build --noinflect --outfile _auto_db_schema.py
           black _auto_db_schema.py
           patch -p1 _auto_db_schema.py < ../../../patches/models.patch
           rm _auto_db_schema.py.orig
       - name: Create Pull Request
+        if: $NEEDS_UPDATE == 1
         uses: peter-evans/create-pull-request@v3
         with:
             token: ${{ secrets.GITHUB_TOKEN }}
