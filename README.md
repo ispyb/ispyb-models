@@ -1,5 +1,16 @@
 This provides a set of [SQLAlchemy](https://www.sqlalchemy.org/) ORM models for the [ISPyB database](https://github.com/ispyb/ispyb-database/).
 
+
+## Installation
+
+Install from pypi [ispyb-models](https://pypi.org/project/ispyb-models):
+
+```bash
+pip install ispyb-models
+```
+
+## Basic Usage
+
 ```python
 from ispyb import models
 
