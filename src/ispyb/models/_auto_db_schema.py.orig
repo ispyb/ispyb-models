@@ -27,10 +27,9 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
 
-from .base import CustomBase
-
-Base = declarative_base(cls=CustomBase)
+Base = declarative_base()
 metadata = Base.metadata
 
 
@@ -2793,15 +2792,15 @@ class AbInitioModel(Base):
     comments = Column(String(512))
     creationTime = Column(DateTime)
 
-    AveragedModel = relationship(
+    Model = relationship(
         "Model", primaryjoin="AbInitioModel.averagedModelId == Model.modelId"
     )
     ModelList = relationship("ModelList")
-    RapidShapeDeterminationModel = relationship(
+    Model1 = relationship(
         "Model",
         primaryjoin="AbInitioModel.rapidShapeDeterminationModelId == Model.modelId",
     )
-    ShapeDeterminationModel = relationship(
+    Model2 = relationship(
         "Model", primaryjoin="AbInitioModel.shapeDeterminationModelId == Model.modelId"
     )
 
@@ -6180,6 +6179,10 @@ class Image(Base):
     )
 
     DataCollection = relationship(
+        "DataCollection",
+        primaryjoin="Image.dataCollectionId == DataCollection.dataCollectionId",
+    )
+    DataCollection1 = relationship(
         "DataCollection",
         primaryjoin="Image.dataCollectionId == DataCollection.dataCollectionId",
     )
