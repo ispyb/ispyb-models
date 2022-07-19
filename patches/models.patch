@@ -1,12 +1,12 @@
 --- a/src/ispyb/models/_auto_db_schema.py	2022-07-18 09:48:17.000000000 +0200
 +++ b/src/ispyb/models/_auto_db_schema_patched.py	2022-07-18 10:21:46.000000000 +0200
-@@ -27,8 +27,10 @@
+@@ -29,7 +29,10 @@
  from sqlalchemy.orm import relationship
  from sqlalchemy.ext.declarative import declarative_base
  
-+from .base import CustomBase
- 
 -Base = declarative_base()
++from .base import CustomBase
++
 +
 +Base = declarative_base(cls=CustomBase)
  metadata = Base.metadata
