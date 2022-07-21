@@ -9,3 +9,6 @@ __version__ = "1.0.0"
 UserGroup.Permission = relationship(
     "Permission", secondary="UserGroup_has_Permission", back_populates="UserGroup"
 )
+UserGroup.Person = relationship(
+    "Person", secondary="UserGroup_has_Person", back_populates="UserGroup"
+)
