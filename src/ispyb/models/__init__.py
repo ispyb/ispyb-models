@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from ._auto_db_schema import *  # noqa F403
 from ._auto_db_schema import UserGroup, Proposal, BLSession
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 
 UserGroup.Permission = relationship(
