@@ -27,6 +27,6 @@ jobs:
         # https://github.community/t/workflow-run-doent-preserve-github-ref/155148/4
         # if: startsWith(github.event.workflow_run.head_branch, 'refs/tags')
         if: startsWith(github.ref, 'refs/tags')
-        uses: pypa/gh-action-pypi-publish@master
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
