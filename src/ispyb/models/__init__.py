@@ -14,24 +14,25 @@ UserGroup.Permission = relationship(
 UserGroup.Person = relationship(
     "Person", secondary="UserGroup_has_Person", back_populates="UserGroup"
 )
-Proposal.BLSession = relationship("BLSession", back_populates="Proposal")
-Proposal.ProposalHasPerson = relationship(
-    "ProposalHasPerson", back_populates="Proposal"
-)
-BLSession.SessionHasPerson = relationship(
-    "SessionHasPerson", back_populates="BLSession"
-)
-BLSession.SessionType = relationship("SessionType", back_populates="BLSession")
 
 
-def proposal(self):
-    return self.proposalCode + self.proposalNumber
+class ModifiedProposal(Proposal):
+    BLSession = relationship("BLSession", back_populates="Proposal")
+    ProposalHasPerson = relationship("ProposalHasPerson", back_populates="Proposal")
+
+    @hybrid_property
+    def proposal(self):
+        return self.proposalCode + self.proposalNumber
 
 
-Proposal.proposal = hybrid_property(proposal)
+Proposal = ModifiedProposal
 
 
 class ModifiedBLSession(BLSession):
+    SessionHasPerson = relationship("SessionHasPerson", back_populates="BLSession")
+
+    SessionType = relationship("SessionType", back_populates="BLSession")
+
     @hybrid_property
     def session(self):
         if self.Proposal:
