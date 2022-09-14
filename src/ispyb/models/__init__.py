@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -13,18 +14,14 @@ UserGroup.Permission = relationship(
 UserGroup.Person = relationship(
     "Person", secondary="UserGroup_has_Person", back_populates="UserGroup"
 )
-Proposal.BLSession = relationship(
-    "BLSession", back_populates="Proposal"
-)
+Proposal.BLSession = relationship("BLSession", back_populates="Proposal")
 Proposal.ProposalHasPerson = relationship(
     "ProposalHasPerson", back_populates="Proposal"
 )
 BLSession.SessionHasPerson = relationship(
     "SessionHasPerson", back_populates="BLSession"
 )
-BLSession.SessionType = relationship(
-    "SessionType", back_populates="BLSession"
-)
+BLSession.SessionType = relationship("SessionType", back_populates="BLSession")
 
 
 def proposal(self):
@@ -34,16 +31,24 @@ def proposal(self):
 Proposal.proposal = hybrid_property(proposal)
 
 
-def session(self):
-    if self.Proposal:
-        return (
-            self.Proposal.proposalCode
-            + self.Proposal.proposalNumber
-            + "-"
-            + str(self.visit_number)
+class ModifiedBLSession(BLSession):
+    @hybrid_property
+    def session(self):
+        if self.Proposal:
+            return (
+                self.Proposal.proposalCode
+                + self.Proposal.proposalNumber
+                + "-"
+                + str(self.visit_number)
+            )
+        else:
+            return None
+
+    @session.expression
+    def session(cls):
+        return func.concat(
+            Proposal.proposalCode, Proposal.proposalNumber, "-", cls.visit_number
         )
-    else:
-        return None
 
 
-BLSession.session = hybrid_property(session)
+BLSession = ModifiedBLSession
