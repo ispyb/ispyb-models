@@ -5,7 +5,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from ._auto_db_schema import *  # noqa F403
 from ._auto_db_schema import UserGroup, Proposal, BLSession
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 
 UserGroup.Permission = relationship(
