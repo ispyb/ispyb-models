@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from ._auto_db_schema import *  # noqa F403
-from ._auto_db_schema import UserGroup, Proposal, BLSession
+from ._auto_db_schema import UserGroup, Proposal, BLSubSample, BLSession, Protein
 
 __version__ = "1.0.3"
 
@@ -14,6 +14,16 @@ UserGroup.Permission = relationship(
 UserGroup.Person = relationship(
     "Person", secondary="UserGroup_has_Person", back_populates="UserGroup"
 )
+
+Protein.ConcentrationType = relationship(
+    "ConcentrationType",
+    foreign_keys=[Protein.concentrationTypeId],
+    primaryjoin="Protein.concentrationTypeId == ConcentrationType.concentrationTypeId",
+)
+
+BLSubSample.Position1 = relationship("Position", foreign_keys=[BLSubSample.positionId])
+
+BLSubSample.Position2 = relationship("Position", foreign_keys=[BLSubSample.position2Id])
 
 
 class ModifiedProposal(Proposal):
