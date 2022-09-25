@@ -61,5 +61,16 @@ class ModifiedBLSession(BLSession):
             Proposal.proposalCode, Proposal.proposalNumber, "-", cls.visit_number
         )
 
+    @hybrid_property
+    def proposal(self):
+        if self.Proposal:
+            return self.Proposal.proposalCode + self.Proposal.proposalNumber
+        else:
+            return None
+
+    @proposal.expression
+    def proposal(cls):
+        return func.concat(Proposal.proposalCode, Proposal.proposalNumber)
+
 
 BLSession = ModifiedBLSession
