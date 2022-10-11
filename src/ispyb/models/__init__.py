@@ -20,7 +20,7 @@ from ._auto_db_schema import (
     BLSession,
     Protein,
     Proposal,
-    Workflow
+    Workflow,
 )
 
 __version__ = "1.0.6"
