@@ -23,7 +23,7 @@ from ._auto_db_schema import (
     Workflow,
 )
 
-__version__ = "1.0.6"
+__version__ = "1.0.7"
 
 DataCollection.GridInfo = relationship(
     "GridInfo", secondary="DataCollectionGroup", back_populates="DataCollection"
