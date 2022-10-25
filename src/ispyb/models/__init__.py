@@ -8,6 +8,7 @@ from ._auto_db_schema import (
     AutoProcIntegration,
     AutoProcScaling,
     DataCollection,
+    DataCollectionGroup,
     GridInfo,
     # ProcessingJob,
     Screening,
@@ -19,12 +20,19 @@ from ._auto_db_schema import (
     BLSession,
     Protein,
     Proposal,
+    Workflow,
 )
 
 __version__ = "1.0.6"
 
 DataCollection.GridInfo = relationship(
     "GridInfo", secondary="DataCollectionGroup", back_populates="DataCollection"
+)
+DataCollectionGroup.Workflow = relationship(
+    "Workflow", back_populates="DataCollectionGroup"
+)
+Workflow.DataCollectionGroup = relationship(
+    "DataCollectionGroup", back_populates="Workflow"
 )
 
 GridInfo.DataCollection = relationship(
