@@ -213,7 +213,7 @@ class ComponentType(Base):
     __tablename__ = "ComponentType"
 
     componentTypeId = Column(INTEGER(10), primary_key=True)
-    name = Column(String(31), nullable=False)
+    name = Column(String(31), nullable=False, unique=True)
 
 
 class ConcentrationType(Base):
@@ -449,6 +449,16 @@ class EMMicroscope(Base):
     C2aperture = Column(Float)
     ObjAperture = Column(Float)
     C2lens = Column(Float)
+
+
+class EventType(Base):
+    __tablename__ = "EventType"
+    __table_args__ = {
+        "comment": "Defines the list of event types which can occur during a data collection."
+    }
+
+    eventTypeId = Column(INTEGER(11), primary_key=True)
+    name = Column(String(30), nullable=False, unique=True)
 
 
 class Frame(Base):
@@ -1336,6 +1346,8 @@ t_v_datacollection_summary = Table(
             "Characterization",
             "Dehydration",
             "Still",
+            "SSX-Chip",
+            "SSX-Jet",
         ),
     ),
     Column("DataCollectionGroup_startTime", DateTime),
@@ -1679,6 +1691,8 @@ t_v_datacollection_summary_datacollectiongroup = Table(
             "Characterization",
             "Dehydration",
             "Still",
+            "SSX-Chip",
+            "SSX-Jet",
         ),
     ),
     Column("DataCollectionGroup_startTime", DateTime),
@@ -3918,11 +3932,32 @@ class BLSession(Base):
     Shipping = relationship("Shipping", secondary="ShippingHasSession")
 
 
+class Component(Base):
+    __tablename__ = "Component"
+    __table_args__ = {
+        "comment": "Description of a component that can be used inside a crystal or a sample."
+    }
+
+    componentId = Column(INTEGER(11), primary_key=True)
+    componentTypeId = Column(
+        ForeignKey("ComponentType.componentTypeId"), nullable=False, index=True
+    )
+    proposalId = Column(
+        ForeignKey("Proposal.proposalId", ondelete="CASCADE", onupdate="CASCADE"),
+        index=True,
+    )
+    name = Column(String(255), nullable=False)
+    composition = Column(String(255))
+
+    ComponentType = relationship("ComponentType")
+    Proposal = relationship("Proposal")
+
+
 class LabContact(Base):
     __tablename__ = "LabContact"
     __table_args__ = (
-        Index("personAndProposal", "personId", "proposalId", unique=True),
         Index("cardNameAndProposal", "cardName", "proposalId", unique=True),
+        Index("personAndProposal", "personId", "proposalId", unique=True),
     )
 
     labContactId = Column(INTEGER(10), primary_key=True)
@@ -4578,6 +4613,32 @@ class BLSampleTypeHasComponent(Base):
 
     Crystal = relationship("Crystal")
     Protein = relationship("Protein")
+
+
+class CrystalComposition(Base):
+    __tablename__ = "CrystalComposition"
+    __table_args__ = {
+        "comment": "Links a crystal to it's components with a specified abundance or ratio."
+    }
+
+    crystalCompositionId = Column(INTEGER(11), primary_key=True)
+    componentId = Column(
+        ForeignKey("Component.componentId"), nullable=False, index=True
+    )
+    crystalId = Column(ForeignKey("Crystal.crystalId"), nullable=False, index=True)
+    concentrationTypeId = Column(
+        ForeignKey("ConcentrationType.concentrationTypeId"), index=True
+    )
+    abundance = Column(
+        Float,
+        comment="Abundance or oncentration in the unit defined by concentrationTypeId.",
+    )
+    ratio = Column(Float)
+    ph = Column(Float)
+
+    Component = relationship("Component")
+    ConcentrationType = relationship("ConcentrationType")
+    Crystal = relationship("Crystal")
 
 
 class CrystalHasUUID(Base):
@@ -5254,8 +5315,9 @@ class DataCollectionGroup(Base):
             "Characterization",
             "Dehydration",
             "Still",
-        ),
-        comment="Experiment type flag",
+            "SSX-Chip",
+            "SSX-Jet",
+        )
     )
     startTime = Column(DateTime, comment="Start time of the dataCollectionGroup")
     endTime = Column(DateTime, comment="end time of the dataCollectionGroup")
@@ -5373,6 +5435,32 @@ class RobotAction(Base):
 
     BLSample = relationship("BLSample")
     BLSession = relationship("BLSession")
+
+
+class SampleComposition(Base):
+    __tablename__ = "SampleComposition"
+    __table_args__ = {
+        "comment": "Links a sample to it's components with a specified abundance or ratio."
+    }
+
+    sampleCompositionId = Column(INTEGER(11), primary_key=True)
+    componentId = Column(
+        ForeignKey("Component.componentId"), nullable=False, index=True
+    )
+    blSampleId = Column(ForeignKey("BLSample.blSampleId"), nullable=False, index=True)
+    concentrationTypeId = Column(
+        ForeignKey("ConcentrationType.concentrationTypeId"), index=True
+    )
+    abundance = Column(
+        Float,
+        comment="Abundance or oncentration in the unit defined by concentrationTypeId.",
+    )
+    ratio = Column(Float)
+    ph = Column(Float)
+
+    BLSample = relationship("BLSample")
+    Component = relationship("Component")
+    ConcentrationType = relationship("ConcentrationType")
 
 
 class Structure(Base):
@@ -6098,6 +6186,32 @@ class DataCollection(Base):
     ScreeningStrategySubWedge = relationship("ScreeningStrategySubWedge")
 
 
+class SSXDataCollection(DataCollection):
+    __tablename__ = "SSXDataCollection"
+    __table_args__ = {"comment": "Extends DataCollection with SSX-specific fields."}
+
+    dataCollectionId = Column(
+        ForeignKey(
+            "DataCollection.dataCollectionId", ondelete="CASCADE", onupdate="CASCADE"
+        ),
+        primary_key=True,
+        comment="Primary key is same as dataCollection (1 to 1).",
+    )
+    repetitionRate = Column(Float)
+    energyBandwidth = Column(Float)
+    monoStripe = Column(String(255))
+    jetSpeed = Column(Float, comment="For jet experiments.")
+    jetSize = Column(Float, comment="For jet experiments.")
+    chipPattern = Column(String(255), comment="For chip experiments.")
+    chipModel = Column(String(255), comment="For chip experiments.")
+    reactionDuration = Column(
+        Float,
+        comment="When images are taken at constant time relative to reaction start.",
+    )
+    laserEnergy = Column(Float)
+    experimentName = Column(String(255))
+
+
 class AutoProcProgram(Base):
     __tablename__ = "AutoProcProgram"
 
@@ -6144,6 +6258,23 @@ class DataCollectionFileAttachment(Base):
     createTime = Column(
         TIMESTAMP, nullable=False, server_default=text("current_timestamp()")
     )
+
+    DataCollection = relationship("DataCollection")
+
+
+class EventChain(Base):
+    __tablename__ = "EventChain"
+    __table_args__ = {"comment": "Groups events together in a data collection."}
+
+    eventChainId = Column(INTEGER(11), primary_key=True)
+    dataCollectionId = Column(
+        ForeignKey(
+            "DataCollection.dataCollectionId", ondelete="CASCADE", onupdate="CASCADE"
+        ),
+        nullable=False,
+        index=True,
+    )
+    name = Column(String(255))
 
     DataCollection = relationship("DataCollection")
 
@@ -6322,6 +6453,37 @@ class AutoProcProgramAttachment(Base):
     recordTimeStamp = Column(DateTime, comment="Creation or last update date/time")
 
     AutoProcProgram = relationship("AutoProcProgram")
+
+
+class Event(Base):
+    __tablename__ = "Event"
+    __table_args__ = {
+        "comment": "Describes something that happend during a data collection and should be taken into account for data analysis. Can be reapeted at a specified frequency or not."
+    }
+
+    eventId = Column(INTEGER(11), primary_key=True)
+    eventChainId = Column(
+        ForeignKey("EventChain.eventChainId", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    componentId = Column(ForeignKey("Component.componentId"), index=True)
+    eventTypeId = Column(
+        ForeignKey("EventType.eventTypeId"), nullable=False, index=True
+    )
+    name = Column(String(255))
+    offset = Column(
+        Float,
+        nullable=False,
+        comment="Start of the event relative to data collection start time in seconds.",
+    )
+    duration = Column(Float, comment="Duration of the event if applicable.")
+    period = Column(Float, comment="Repetition period if applicable in seconds.")
+    repetition = Column(Float, comment="Number of repetition if applicable.")
+
+    Component = relationship("Component")
+    EventChain = relationship("EventChain")
+    EventType = relationship("EventType")
 
 
 class ImageQualityIndicators(Base):
