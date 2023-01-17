@@ -37,6 +37,8 @@ jobs:
           fi
       - name: Set up Python
         uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
       - name: Generate test database
         if: env.NEEDS_UPDATE == 1
         run: |
