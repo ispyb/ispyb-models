@@ -1,5 +1,5 @@
 from sqlalchemy import func
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from ._auto_db_schema import *  # noqa F403
@@ -21,6 +21,9 @@ from ._auto_db_schema import (
     Protein,
     Proposal,
     Workflow,
+    SSXDataCollection,
+    CrystalComposition,
+    SampleComposition,
 )
 
 __version__ = "1.0.7"
@@ -140,3 +143,22 @@ class ModifiedBLSession(BLSession):
 
 
 BLSession = ModifiedBLSession
+
+SSXDataCollection.DataCollection = relationship(
+    "DataCollection", back_populates="SSXDataCollection"
+)
+DataCollection.SSXDataCollection = relationship(
+    "SSXDataCollection", back_populates="DataCollection", uselist=False
+)
+
+CrystalComposition.Crystal = relationship(
+    "Crystal",
+    primaryjoin="CrystalComposition.crystalId == Crystal.crystalId",
+    backref=backref("crystal_compositions", cascade="all, delete-orphan"),
+)
+
+SampleComposition.BLSample = relationship(
+    "BLSample",
+    primaryjoin="SampleComposition.blSampleId == BLSample.blSampleId",
+    backref=backref("sample_compositions", cascade="all, delete-orphan"),
+)
