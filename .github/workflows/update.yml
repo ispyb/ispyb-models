@@ -40,7 +40,7 @@ jobs:
       - name: Generate test database
         if: env.NEEDS_UPDATE == 1
         run: |
-          sudo apt-get update && sudo apt-get install -y mariadb-client-10.3
+          sudo apt-get update && sudo apt-get install -y mariadb-client
           cat >~/.my.cnf <<EOF
           [client]
           user=root
