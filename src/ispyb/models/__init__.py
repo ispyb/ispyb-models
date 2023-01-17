@@ -26,7 +26,7 @@ from ._auto_db_schema import (
     SampleComposition,
 )
 
-__version__ = "1.0.7"
+__version__ = "1.1.0"
 
 DataCollection.GridInfo = relationship(
     "GridInfo", secondary="DataCollectionGroup", back_populates="DataCollection"
