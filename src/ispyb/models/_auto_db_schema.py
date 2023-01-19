@@ -3956,8 +3956,8 @@ class Component(Base):
 class LabContact(Base):
     __tablename__ = "LabContact"
     __table_args__ = (
-        Index("personAndProposal", "personId", "proposalId", unique=True),
         Index("cardNameAndProposal", "cardName", "proposalId", unique=True),
+        Index("personAndProposal", "personId", "proposalId", unique=True),
     )
 
     labContactId = Column(INTEGER(10), primary_key=True)
@@ -4178,20 +4178,6 @@ class Protein(Base):
     ComponentSubType = relationship(
         "ComponentSubType", secondary="Component_has_SubType"
     )
-
-
-class ProteinHasLattice(Protein):
-    __tablename__ = "Protein_has_Lattice"
-
-    proteinId = Column(
-        ForeignKey("Protein.proteinId", ondelete="CASCADE"), primary_key=True
-    )
-    cell_a = Column(Float(asdecimal=True))
-    cell_b = Column(Float(asdecimal=True))
-    cell_c = Column(Float(asdecimal=True))
-    cell_alpha = Column(Float(asdecimal=True))
-    cell_beta = Column(Float(asdecimal=True))
-    cell_gamma = Column(Float(asdecimal=True))
 
 
 class SWOnceToken(Base):
@@ -4474,6 +4460,22 @@ t_Project_has_Session = Table(
         index=True,
     ),
 )
+
+
+class ProteinHasLattice(Base):
+    __tablename__ = "Protein_has_Lattice"
+
+    proteinId = Column(
+        ForeignKey("Protein.proteinId", ondelete="CASCADE"), primary_key=True
+    )
+    cell_a = Column(Float(asdecimal=True))
+    cell_b = Column(Float(asdecimal=True))
+    cell_c = Column(Float(asdecimal=True))
+    cell_alpha = Column(Float(asdecimal=True))
+    cell_beta = Column(Float(asdecimal=True))
+    cell_gamma = Column(Float(asdecimal=True))
+
+    Protein = relationship("Protein", uselist=False)
 
 
 class ProteinHasPDB(Base):
@@ -6186,32 +6188,6 @@ class DataCollection(Base):
     ScreeningStrategySubWedge = relationship("ScreeningStrategySubWedge")
 
 
-class SSXDataCollection(DataCollection):
-    __tablename__ = "SSXDataCollection"
-    __table_args__ = {"comment": "Extends DataCollection with SSX-specific fields."}
-
-    dataCollectionId = Column(
-        ForeignKey(
-            "DataCollection.dataCollectionId", ondelete="CASCADE", onupdate="CASCADE"
-        ),
-        primary_key=True,
-        comment="Primary key is same as dataCollection (1 to 1).",
-    )
-    repetitionRate = Column(Float)
-    energyBandwidth = Column(Float)
-    monoStripe = Column(String(255))
-    jetSpeed = Column(Float, comment="For jet experiments.")
-    jetSize = Column(Float, comment="For jet experiments.")
-    chipPattern = Column(String(255), comment="For chip experiments.")
-    chipModel = Column(String(255), comment="For chip experiments.")
-    reactionDuration = Column(
-        Float,
-        comment="When images are taken at constant time relative to reaction start.",
-    )
-    laserEnergy = Column(Float)
-    experimentName = Column(String(255))
-
-
 class AutoProcProgram(Base):
     __tablename__ = "AutoProcProgram"
 
@@ -6355,6 +6331,34 @@ class Particle(Base):
     y = Column(Float)
 
     DataCollection = relationship("DataCollection")
+
+
+class SSXDataCollection(Base):
+    __tablename__ = "SSXDataCollection"
+    __table_args__ = {"comment": "Extends DataCollection with SSX-specific fields."}
+
+    dataCollectionId = Column(
+        ForeignKey(
+            "DataCollection.dataCollectionId", ondelete="CASCADE", onupdate="CASCADE"
+        ),
+        primary_key=True,
+        comment="Primary key is same as dataCollection (1 to 1).",
+    )
+    repetitionRate = Column(Float)
+    energyBandwidth = Column(Float)
+    monoStripe = Column(String(255))
+    jetSpeed = Column(Float, comment="For jet experiments.")
+    jetSize = Column(Float, comment="For jet experiments.")
+    chipPattern = Column(String(255), comment="For chip experiments.")
+    chipModel = Column(String(255), comment="For chip experiments.")
+    reactionDuration = Column(
+        Float,
+        comment="When images are taken at constant time relative to reaction start.",
+    )
+    laserEnergy = Column(Float)
+    experimentName = Column(String(255))
+
+    DataCollection = relationship("DataCollection", uselist=False)
 
 
 class XRFFluorescenceMapping(Base):
