@@ -69,7 +69,7 @@ jobs:
               if: env.NEEDS_UPDATE == 1
               run: |
                   pip install sqlalchemy sqlacodegen black==22.3 mysql-connector-python
-                  sh generate_models.sh
+                  . generate_models.sh
             - name: Create Pull Request
               if: env.NEEDS_UPDATE == 1
               uses: peter-evans/create-pull-request@v3

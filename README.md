@@ -1,6 +1,5 @@
 This provides a set of [SQLAlchemy](https://www.sqlalchemy.org/) ORM models for the [ISPyB database](https://github.com/ispyb/ispyb-database/).
 
-
 ## Installation
 
 Install from pypi [ispyb-models](https://pypi.org/project/ispyb-models):
@@ -34,6 +33,7 @@ datacollections = (
 ### Manually generate the DB schema
 
 Checkout the specific tag for a given `ispyb-database` version:
+
 ```bash
 $ git clone -b v1.18.1 https://github.com/ispyb/ispyb-database.git
 $ # or, if you have an existing copy of the repository:
@@ -41,19 +41,22 @@ $ git checkout v1.18.1
 ```
 
 Apply the schema patch in `patches/circular_references.patch` to avoid circular foreign key references:
+
 ```bash
 $ patch -p1 < ispyb-models/patches/circular_references.patch
 ```
 
 Then run the `ispyb-database` `build.sh` script to generate the database:
+
 ```bash
 $ sh build.sh
 ```
 
 Generate the models with [sqlacodegen](https://pypi.org/project/sqlacodegen/)
 in `src/ispyb/models/`:
+
 ```bash
-sqlacodegen mysql+mysqlconnector://user:password@host:port/ispyb_build --noinflect --outfile _auto_db_schema.py
+. generate_models.sh
 ```
 
 ### Do not edit the output file yourself
