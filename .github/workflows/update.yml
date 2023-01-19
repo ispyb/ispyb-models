@@ -83,5 +83,6 @@ jobs:
                       Before merging this pull request you may want to:
                       * [ ] Ensure tests pass
                       * [ ] Update `HISTORY.md` to reflect the changes in this pull request
+                      * [ ] Bump version number with `bump2version`
 
                   branch: update-schema-v${{ env.SCHEMA_VERSION }}
