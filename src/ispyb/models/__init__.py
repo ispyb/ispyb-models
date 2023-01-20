@@ -1,5 +1,5 @@
 from sqlalchemy import func
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from ._auto_db_schema import *  # noqa F403
@@ -23,7 +23,11 @@ from ._auto_db_schema import (
     Workflow,
     SSXDataCollection,
     CrystalComposition,
+    Crystal,
     SampleComposition,
+    BLSample,
+    Event,
+    EventChain,
 )
 
 __version__ = "1.1.0"
@@ -153,17 +157,33 @@ DataCollection.SSXDataCollection = relationship(
 
 CrystalComposition.Crystal = relationship(
     "Crystal",
-    primaryjoin="CrystalComposition.crystalId == Crystal.crystalId",
-    backref=backref("crystal_compositions", cascade="all, delete-orphan"),
+    back_populates="crystal_compositions",
+)
+
+Crystal.crystal_compositions = relationship(
+    "CrystalComposition",
+    back_populates="Crystal",
+    cascade="all, delete-orphan",
 )
 
 SampleComposition.BLSample = relationship(
     "BLSample",
-    primaryjoin="SampleComposition.blSampleId == BLSample.blSampleId",
-    backref=backref("sample_compositions", cascade="all, delete-orphan"),
+    back_populates="sample_compositions",
+)
+
+BLSample.sample_compositions = relationship(
+    "SampleComposition",
+    back_populates="BLSample",
+    cascade="all, delete-orphan",
 )
 
 Event.EventChain = relationship(
     "EventChain",
-    backref=backref("events", cascade="all, delete-orphan"),
+    back_populates="events",
+)
+
+EventChain.events = relationship(
+    "Event",
+    back_populates="EventChain",
+    cascade="all, delete-orphan",
 )
