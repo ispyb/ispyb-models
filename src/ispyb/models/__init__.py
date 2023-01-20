@@ -162,3 +162,8 @@ SampleComposition.BLSample = relationship(
     primaryjoin="SampleComposition.blSampleId == BLSample.blSampleId",
     backref=backref("sample_compositions", cascade="all, delete-orphan"),
 )
+
+Event.EventChain = relationship(
+    "EventChain",
+    backref=backref("events", cascade="all, delete-orphan"),
+)
