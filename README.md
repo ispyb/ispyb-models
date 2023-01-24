@@ -30,7 +30,23 @@ datacollections = (
 )
 ```
 
-### Manually generate the DB schema
+## Generate a new version
+
+To update the models you need to run the workflow `Update Models` through GitHub Actions panel.
+This will create a new branch with models matching the latest DB release and create a pull request for merge this branch into main. Before merging there are some things you need to do:
+
+-   Make sure py-ispyb tests still pass with these new models
+-   Update `HISTORY.md` to reflect the changes
+-   Bump version number with `bump2version`
+
+### ⚠️ Do not edit the output file yourself
+
+**The resulting `_auto_db_schema.py` should not be edited** (other than automatic
+formatting with `black` or sorting of imports with `isort`). All models are imported
+into and accessed via the `__init__.py`. Any modifications, e.g. injecting additional
+relationships between models should be done here.
+
+### ⚠️ _[for local test]_ Manually update the DB schema
 
 Checkout the specific tag for a given `ispyb-database` version:
 
@@ -58,10 +74,3 @@ in `src/ispyb/models/`:
 ```bash
 . generate_models.sh
 ```
-
-### Do not edit the output file yourself
-
-**The resulting `_auto_db_schema.py` should not be edited** (other than automatic
-formatting with `black` or sorting of imports with `isort`). All models are imported
-into and accessed via the `__init__.py`. Any modifications, e.g. injecting additional
-relationships between models should be done here.
