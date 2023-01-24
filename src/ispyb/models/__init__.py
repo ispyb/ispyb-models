@@ -21,9 +21,16 @@ from ._auto_db_schema import (
     Protein,
     Proposal,
     Workflow,
+    SSXDataCollection,
+    CrystalComposition,
+    Crystal,
+    SampleComposition,
+    BLSample,
+    Event,
+    EventChain,
 )
 
-__version__ = "1.0.7"
+__version__ = "1.1.0"
 
 DataCollection.GridInfo = relationship(
     "GridInfo", secondary="DataCollectionGroup", back_populates="DataCollection"
@@ -140,3 +147,43 @@ class ModifiedBLSession(BLSession):
 
 
 BLSession = ModifiedBLSession
+
+SSXDataCollection.DataCollection = relationship(
+    "DataCollection", back_populates="SSXDataCollection"
+)
+DataCollection.SSXDataCollection = relationship(
+    "SSXDataCollection", back_populates="DataCollection", uselist=False
+)
+
+CrystalComposition.Crystal = relationship(
+    "Crystal",
+    back_populates="crystal_compositions",
+)
+
+Crystal.crystal_compositions = relationship(
+    "CrystalComposition",
+    back_populates="Crystal",
+    cascade="all, delete-orphan",
+)
+
+SampleComposition.BLSample = relationship(
+    "BLSample",
+    back_populates="sample_compositions",
+)
+
+BLSample.sample_compositions = relationship(
+    "SampleComposition",
+    back_populates="BLSample",
+    cascade="all, delete-orphan",
+)
+
+Event.EventChain = relationship(
+    "EventChain",
+    back_populates="events",
+)
+
+EventChain.events = relationship(
+    "Event",
+    back_populates="EventChain",
+    cascade="all, delete-orphan",
+)
